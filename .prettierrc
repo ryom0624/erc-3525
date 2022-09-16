@@ -1,11 +1,18 @@
 {
-	"overrides": [
-		{
-		  "files": "*.sol",
-		  "options": {
-			"printWidth": 120,
-			"explicitTypes": "always"
-		  }
-		}
-	  ]
+  "overrides": [
+    {
+      "files": "*.sol",
+      "options": {
+        "printWidth": 150,
+        "explicitTypes": "always"
+      }
+    },
+    {
+      "files": "*.ts",
+      "options": {
+        "printWidth": 150,
+        "explicitTypes": "always"
+      }
+    }
+  ]
 }

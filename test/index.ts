@@ -1,7 +1,7 @@
 import { BigNumber } from "ethers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { ERC3525BurnableUpgradeable } from "../typechain";
+import { ERC3525BurnableUpgradeable } from "../typechain-types";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { TokenData, ZERO_ADDRESS } from "./lib/constants";
 
@@ -10,6 +10,7 @@ describe("ERC3525", function () {
     const ERC3525Factory = await ethers.getContractFactory(
       "ERC3525BurnableUpgradeable"
     );
+
     const erc3525 =
       (await ERC3525Factory.deploy()) as ERC3525BurnableUpgradeable;
     await erc3525.deployed();
@@ -127,12 +128,12 @@ describe("ERC3525", function () {
       const t = await mint();
       const oldOwner = t.owner;
       const [minter, receiver] = await ethers.getSigners();
-      
+
       await t.erc3525["transferFrom(address,address,uint256)"](
         t.owner,
         receiver.address,
         t.id
-      )
+      );
 
       await checkTransferEvent(t.erc3525, oldOwner, receiver.address, t.id);
       const newOwner = receiver.address;
@@ -151,7 +152,9 @@ describe("ERC3525", function () {
         approval.address,
         t.balance
       );
-      expect(await t.erc3525.allowance(t.id, approval.address)).to.eq(t.balance);
+      expect(await t.erc3525.allowance(t.id, approval.address)).to.eq(
+        t.balance
+      );
       await t.erc3525["transferFrom(address,address,uint256)"](
         t.owner,
         receiver.address,
@@ -170,7 +173,9 @@ describe("ERC3525", function () {
           approval.address,
           t.balance
         )
-      ).revertedWith("ERC3525: approve caller is not owner nor approved for all");
+      ).revertedWith(
+        "ERC3525: approve caller is not owner nor approved for all"
+      );
 
       await expect(
         t.erc3525["transferFrom(address,address,uint256)"](
@@ -299,8 +304,10 @@ describe("ERC3525", function () {
         f.id,
         t.id,
         value
-      )
-      expect(await erc3525.allowance(f.id, spender.address)).to.eq(expectApprovedValue);
+      );
+      expect(await erc3525.allowance(f.id, spender.address)).to.eq(
+        expectApprovedValue
+      );
     });
 
     it("transfer value to id should sucess after setApprovalForAll", async () => {

@@ -1,4 +1,4 @@
-require("@nomicfoundation/hardhat-toolbox");
+import "@nomicfoundation/hardhat-toolbox";
 
 module.exports = {
   solidity: {
@@ -19,5 +19,5 @@ module.exports = {
     coverage: {
       url: "http://127.0.0.1:8555", // Coverage launches its own ganache-cli client
     },
-  }
+  },
 };

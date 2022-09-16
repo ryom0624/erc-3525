@@ -46,22 +46,22 @@ contract ERC3525Mock is ERC3525Upgradeable {
             maturity: maturity_,
             term: term_
         });
-        
+
         ERC3525Upgradeable._mintValue(minter_, slot, value_);
     }
 
     function getSlotDetail(uint256 slot_) public view returns (address, uint8, uint32, uint32) {
         SlotDetail storage slotDetail = _slotDetails[slot_];
         return (
-            slotDetail.underlying, 
-            slotDetail.vestingType, 
-            slotDetail.maturity, 
+            slotDetail.underlying,
+            slotDetail.vestingType,
+            slotDetail.maturity,
             slotDetail.term
         );
     }
 
     /**
-     * @dev Generate the value of slot by utilizing keccak256 algorithm to calculate the hash 
+     * @dev Generate the value of slot by utilizing keccak256 algorithm to calculate the hash
      * value of multi properties.
      */
     function _getSlot(
@@ -70,7 +70,7 @@ contract ERC3525Mock is ERC3525Upgradeable {
         uint32 maturity_,
         uint32 term_
     ) internal pure virtual returns (uint256 slot_) {
-        return 
+        return
             uint256(
                 keccak256(
                     abi.encodePacked(
@@ -84,20 +84,20 @@ contract ERC3525Mock is ERC3525Upgradeable {
     }
 
     function contractURI() public view override returns (string memory) {
-        return 
+        return
             string(
                 abi.encodePacked(
                     /* solhint-disable */
                     'data:application/json;base64,',
                     Base64.encode(
                         abi.encodePacked(
-                            '{"name":"', 
+                            '{"name":"',
                             name(),
                             '","description":"',
                             _contractDescription(),
                             '","image":"',
                             _contractImage(),
-                            '","valueDecimals":"', 
+                            '","valueDecimals":"',
                             uint256(valueDecimals()).toString(),
                             '"}'
                         )
@@ -115,7 +115,7 @@ contract ERC3525Mock is ERC3525Upgradeable {
                     'data:application/json;base64,',
                     Base64.encode(
                         abi.encodePacked(
-                            '{"name":"', 
+                            '{"name":"',
                             _slotName(slot_),
                             '","description":"',
                             _slotDescription(slot_),
@@ -132,7 +132,7 @@ contract ERC3525Mock is ERC3525Upgradeable {
     }
 
     function tokenURI(uint256 tokenId_) public view override returns (string memory) {
-        return 
+        return
             string(
                 abi.encodePacked(
                     "data:application/json;base64,",
@@ -184,7 +184,7 @@ contract ERC3525Mock is ERC3525Upgradeable {
 
     function _slotProperties(uint256 slot_) internal view returns (string memory) {
         SlotDetail storage slotDetail = _slotDetails[slot_];
-        return 
+        return
             string(
                 /* solhint-disable */
                 abi.encodePacked(
@@ -193,28 +193,28 @@ contract ERC3525Mock is ERC3525Upgradeable {
                             '{"name":"underlying",',
                             '"description":"Address of the underlying token locked in this contract.",',
                             '"value":"', Strings.toHexString(uint256(uint160(slotDetail.underlying))), '",',
-                            '"order":1,', 
+                            '"order":1,',
                             '"display_type":"string"},'
                         ),
                         abi.encodePacked(
                             '{"name":"vesting_type",',
                             '"description":"Vesting type that represents the releasing mode of underlying assets.",',
                             '"value":', uint256(slotDetail.vestingType).toString(), ',',
-                            '"order":2,', 
+                            '"order":2,',
                             '"display_type":"number"},'
                         ),
                         abi.encodePacked(
                             '{"name":"maturity",',
                             '"description":"Maturity that all underlying assets would be completely released.",',
                             '"value":', uint256(slotDetail.maturity).toString(), ',',
-                            '"order":3,', 
+                            '"order":3,',
                             '"display_type":"date"},'
                         ),
                         abi.encodePacked(
                             '{"name":"term",',
                             '"description":"The length of the locking period (in seconds)",',
                             '"value":', uint256(slotDetail.term).toString(), ',',
-                            '"order":4,', 
+                            '"order":4,',
                             '"display_type":"number"}'
                         ),
                     ']'
@@ -225,10 +225,10 @@ contract ERC3525Mock is ERC3525Upgradeable {
 
     function _tokenName(uint256 tokenId_) internal view virtual returns (string memory) {
         // solhint-disable-next-line
-        return 
+        return
             string(
                 abi.encodePacked(
-                    IERC3525Metadata(msg.sender).name(), 
+                    IERC3525Metadata(msg.sender).name(),
                     " #", tokenId_.toString()
                 )
             );
@@ -248,8 +248,8 @@ contract ERC3525Mock is ERC3525Upgradeable {
     function _tokenProperties(uint256 tokenId_) internal view returns (string memory) {
         uint256 slot = slotOf(tokenId_);
         SlotDetail storage slotDetail = _slotDetails[slot];
-        
-        return 
+
+        return
             string(
                 abi.encodePacked(
                     /* solhint-disable */

@@ -16,6 +16,9 @@ import "./extensions/IERC3525Metadata.sol";
 import "./periphery/interface/IERC3525MetadataDescriptor.sol";
 import "./utils/StringConvertor.sol";
 
+import "hardhat/console.sol";
+
+
 abstract contract ERC3525Upgradeable is
     IERC3525Metadata,
     IERC721Enumerable,
@@ -72,6 +75,29 @@ abstract contract ERC3525Upgradeable is
         _decimals = decimals_;
     }
 
+    function allTokens() public view returns(TokenData[] memory) {
+        return _allTokens;
+    }
+
+    function allTokensByTokenId(uint256 _tokenId) public view returns(TokenData memory) {
+        return _allTokens[_tokenId];
+    }
+
+    function allTokensIndex(uint256 _tokenId) view public returns(uint256) {
+        return _allTokensIndex[_tokenId];
+    }
+
+    function ownedTokensByAddress(address _addr) public view returns(uint256[] memory) {
+        return _addressData[_addr].ownedTokens;
+    }
+
+    function ownedTokenIndexByAddress(address _addr, uint256 _tokenId) public view returns(uint256) {
+        return _addressData[_addr].ownedTokensIndex[_tokenId];
+    }
+    function ownedTokenApprovalsByAddress(address _addr, address _operator) public view returns(bool) {
+        return _addressData[_addr].approvals[_operator];
+    }
+
     function supportsInterface(bytes4 interfaceId) public view virtual override(IERC165, ERC165Upgradeable) returns (bool) {
         return
             interfaceId == type(IERC3525).interfaceId ||
@@ -125,21 +151,21 @@ abstract contract ERC3525Upgradeable is
 
     function contractURI() public view virtual override returns (string memory) {
         string memory baseURI = _baseURI();
-        return 
-            address(metadataDescriptor) == address(0) ? 
+        return
+            address(metadataDescriptor) == address(0) ?
                 metadataDescriptor.constructContractURI() :
-                bytes(baseURI).length > 0 ? 
-                    string(abi.encodePacked(baseURI, "contract/", Strings.toHexString(address(this)))) : 
+                bytes(baseURI).length > 0 ?
+                    string(abi.encodePacked(baseURI, "contract/", Strings.toHexString(address(this)))) :
                     "";
     }
 
     function slotURI(uint256 slot_) public view virtual override returns (string memory) {
         string memory baseURI = _baseURI();
-        return 
-            address(metadataDescriptor) == address(0) ? 
-                metadataDescriptor.constructSlotURI(slot_) : 
-                bytes(baseURI).length > 0 ? 
-                    string(abi.encodePacked(baseURI, "slot/", slot_.toString())) : 
+        return
+            address(metadataDescriptor) == address(0) ?
+                metadataDescriptor.constructSlotURI(slot_) :
+                bytes(baseURI).length > 0 ?
+                    string(abi.encodePacked(baseURI, "slot/", slot_.toString())) :
                     "";
     }
 
@@ -148,11 +174,11 @@ abstract contract ERC3525Upgradeable is
      */
     function tokenURI(uint256 tokenId_) public view virtual override returns (string memory) {
         string memory baseURI = _baseURI();
-        return 
-            address(metadataDescriptor) == address(0) ? 
-                metadataDescriptor.constructTokenURI(tokenId_) : 
-                bytes(baseURI).length > 0 ? 
-                    string(abi.encodePacked(baseURI, tokenId_.toString())) : 
+        return
+            address(metadataDescriptor) == address(0) ?
+                metadataDescriptor.constructTokenURI(tokenId_) :
+                bytes(baseURI).length > 0 ?
+                    string(abi.encodePacked(baseURI, tokenId_.toString())) :
                     "";
     }
 
@@ -172,6 +198,7 @@ abstract contract ERC3525Upgradeable is
         return _approvedValues[tokenId_][operator_];
     }
 
+    // tokenIdをmintしてvalue付け替え
     function transferFrom(
         uint256 fromTokenId_,
         address to_,
@@ -186,6 +213,7 @@ abstract contract ERC3525Upgradeable is
         return newTokenId;
     }
 
+    // tokenIdの付け替え
     function transferFrom(
         uint256 fromTokenId_,
         uint256 toTokenId_,
@@ -201,6 +229,7 @@ abstract contract ERC3525Upgradeable is
         return _addressData[owner_].ownedTokens.length;
     }
 
+    // まるごと付け替え
     function transferFrom(
         address from_,
         address to_,
@@ -519,10 +548,10 @@ abstract contract ERC3525Upgradeable is
         );
     }
 
-    function _checkOnERC3525Received( 
-        uint256 fromTokenId_, 
-        uint256 toTokenId_, 
-        uint256 value_, 
+    function _checkOnERC3525Received(
+        uint256 fromTokenId_,
+        uint256 toTokenId_,
+        uint256 value_,
         bytes memory data_
     ) private returns (bool) {
         address to = ownerOf(toTokenId_);
@@ -562,7 +591,7 @@ abstract contract ERC3525Upgradeable is
         bytes memory data_
     ) private returns (bool) {
         if (to_.isContract() && IERC165(to_).supportsInterface(type(IERC721Receiver).interfaceId)) {
-            try 
+            try
                 IERC721Receiver(to_).onERC721Received(_msgSender(), from_, tokenId_, data_) returns (bytes4 retval) {
                 return retval == IERC721Receiver.onERC721Received.selector;
             } catch (bytes memory reason) {
